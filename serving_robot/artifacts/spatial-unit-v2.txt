@@ -1,0 +1,19 @@
+test_ambiguity_unknown_negation (test_spatial.SpatialTests) ... ok
+test_blocked_and_unreachable (test_spatial.SpatialTests) ... ok
+test_concurrent_confirm (test_spatial.SpatialTests) ... ok
+test_confirm_rechecks_pose (test_spatial.SpatialTests) ... ok
+test_confirmation_cancel_duplicate (test_spatial.SpatialTests) ... ok
+test_inflight_stop_and_new_instruction (test_spatial.SpatialTests) ... ok
+test_invalid_structure (test_spatial.SpatialTests) ... ok
+test_map_midpoint_and_near (test_spatial.SpatialTests) ... ok
+test_model_veto_and_malformed_fallback (test_spatial.SpatialTests) ... ok
+test_new_instruction_invalidates_candidate (test_spatial.SpatialTests) ... ok
+test_relation_evidence (test_spatial.SpatialTests) ... ok
+test_spatial_physics_routes (test_spatial.SpatialTests) ... ok
+test_stop_priority (test_spatial.SpatialTests) ... ok
+test_unsafe_endpoints (test_spatial.SpatialTests) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.300s
+
+OK

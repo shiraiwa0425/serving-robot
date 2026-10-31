@@ -21,9 +21,15 @@ XML = '''<mujoco><option timestep="0.01" gravity="0 0 -9.81"/><worldbody>
 def free(x,y, margin=.32):
     return margin <= x <= 6-margin and margin <= y <= 6-margin and all(abs(x-a)>w+margin or abs(y-b)>h+margin for a,b,w,h in BOXES)
 
+def segment_free(start,target):
+    steps=max(1,math.ceil(math.dist(start,target)/.02))
+    return all(free(*(start[j]+(target[j]-start[j])*i/steps for j in range(2))) for i in range(steps+1))
+
 def plan(start, target):
+    if not free(*start) or not free(*target):raise ValueError('出発点または目的地が安全領域外です')
     scale=10
     s=tuple(round(v*scale) for v in start); g=tuple(round(v*scale) for v in target)
+    if not segment_free(start,tuple(v/scale for v in s)) or not segment_free(tuple(v/scale for v in g),target):raise ValueError('グリッド接続が安全ではありません')
     q=[(0,s)]; cost={s:0}; prev={}
     while q:
         _,n=heapq.heappop(q)
@@ -47,7 +53,10 @@ class Simulation:
     def stop(self):
         self.path=[]; self.data.ctrl[:]=0; self.status='stopped'; self.target=None
     def go(self,goal):
-        self.path=plan(self.data.qpos[:2],GOALS[goal]); self.target=goal; self.status='moving'
+        self.go_point(GOALS[goal],goal)
+    def go_point(self,point,label):
+        route=plan(self.data.qpos[:2],point)
+        self.path=route; self.target=label; self.status='moving'
     def step(self):
         x,y=self.data.qpos[:2]; vx,vy=self.data.qvel[:2]
         # Fail-safe envelope includes braking distance (v^2 / 2a) and extra margin.

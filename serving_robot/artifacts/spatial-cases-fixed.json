@@ -1,0 +1,223 @@
+[
+  {
+    "text": "2番テーブルと3番テーブルの間へ",
+    "expected": {
+      "action": "move",
+      "relation": "between",
+      "landmarks": [
+        "table2",
+        "table3"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "1番と2番の間へ",
+    "expected": {
+      "action": "move",
+      "relation": "between",
+      "landmarks": [
+        "table1",
+        "table2"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "三番と一番の間へ",
+    "expected": {
+      "action": "move",
+      "relation": "between",
+      "landmarks": [
+        "table1",
+        "table3"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "1番の近くへ",
+    "expected": {
+      "action": "move",
+      "relation": "near",
+      "landmarks": [
+        "table1"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "二番のそばに来て",
+    "expected": {
+      "action": "move",
+      "relation": "near",
+      "landmarks": [
+        "table2"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "三番の付近までお願い",
+    "expected": {
+      "action": "move",
+      "relation": "near",
+      "landmarks": [
+        "table3"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "部屋の右上へ",
+    "expected": {
+      "action": "move",
+      "relation": "corner",
+      "landmarks": [],
+      "corner": "top_right"
+    }
+  },
+  {
+    "text": "左上の角へ",
+    "expected": {
+      "action": "move",
+      "relation": "corner",
+      "landmarks": [],
+      "corner": "top_left"
+    }
+  },
+  {
+    "text": "右下の角に行こう",
+    "expected": {
+      "action": "move",
+      "relation": "corner",
+      "landmarks": [],
+      "corner": "bottom_right"
+    }
+  },
+  {
+    "text": "部屋の左下へ",
+    "expected": {
+      "action": "move",
+      "relation": "corner",
+      "landmarks": [],
+      "corner": "bottom_left"
+    }
+  },
+  {
+    "text": "一番へ配膳して",
+    "expected": {
+      "action": "move",
+      "relation": "landmark",
+      "landmarks": [
+        "table1"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "2番テーブルへ運んで",
+    "expected": {
+      "action": "move",
+      "relation": "landmark",
+      "landmarks": [
+        "table2"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "三番卓に届けて",
+    "expected": {
+      "action": "move",
+      "relation": "landmark",
+      "landmarks": [
+        "table3"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "厨房へ戻って",
+    "expected": {
+      "action": "move",
+      "relation": "landmark",
+      "landmarks": [
+        "kitchen"
+      ],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "2番と3万の間へ",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "12番の近くへ",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "どこかの角へ",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "右上か左下へ",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "1番の右隣へ",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "1番と2番と3番の間へ",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "2番には行かないで",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  },
+  {
+    "text": "座標(2,3)に向かって",
+    "expected": {
+      "action": "clarify",
+      "relation": "none",
+      "landmarks": [],
+      "corner": "none"
+    }
+  }
+]

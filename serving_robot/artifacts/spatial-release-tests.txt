@@ -1,0 +1,31 @@
+test_all_pairs (test_robot.RobotTests) ... ok
+test_guard_vetoes_unsupported_ai_moves (test_robot.RobotTests) ... ok
+test_intents (test_robot.RobotTests) ... ok
+test_physical_contact (test_robot.RobotTests) ... ok
+test_routes (test_robot.RobotTests) ... ok
+test_safety_envelope (test_robot.RobotTests) ... ok
+test_stop (test_robot.RobotTests) ... ok
+test_actual_search_rejects_disconnected_map (test_spatial.SpatialTests) ... ok
+test_ambiguity_unknown_negation (test_spatial.SpatialTests) ... ok
+test_blocked_and_unreachable (test_spatial.SpatialTests) ... ok
+test_concurrent_confirm (test_spatial.SpatialTests) ... ok
+test_confirm_rechecks_pose (test_spatial.SpatialTests) ... ok
+test_confirmation_cancel_duplicate (test_spatial.SpatialTests) ... ok
+test_inflight_stop_and_new_instruction (test_spatial.SpatialTests) ... ok
+test_invalid_structure (test_spatial.SpatialTests) ... ok
+test_map_midpoint_and_near (test_spatial.SpatialTests) ... ok
+test_model_veto_and_malformed_fallback (test_spatial.SpatialTests) ... ok
+test_new_instruction_invalidates_candidate (test_spatial.SpatialTests) ... ok
+test_relation_evidence (test_spatial.SpatialTests) ... ok
+test_spatial_physics_routes (test_spatial.SpatialTests) ... ok
+test_stop_priority (test_spatial.SpatialTests) ... ok
+test_unsafe_endpoints (test_spatial.SpatialTests) ... ok
+test_cancel_new_command_and_stale_ids (test_spatial_http.HTTPTests) ... ok
+test_preview_confirm_once_and_no_client_coordinates (test_spatial_http.HTTPTests) ... ok
+test_request_validation (test_spatial_http.HTTPTests) ... ok
+test_stop_during_http_inference (test_spatial_http.HTTPTests) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 3.344s
+
+OK

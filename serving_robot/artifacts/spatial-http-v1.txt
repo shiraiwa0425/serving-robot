@@ -1,0 +1,9 @@
+test_cancel_new_command_and_stale_ids (test_spatial_http.HTTPTests) ... ok
+test_preview_confirm_once_and_no_client_coordinates (test_spatial_http.HTTPTests) ... ok
+test_request_validation (test_spatial_http.HTTPTests) ... ok
+test_stop_during_http_inference (test_spatial_http.HTTPTests) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.128s
+
+OK
