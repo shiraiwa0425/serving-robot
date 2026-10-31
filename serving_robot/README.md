@@ -25,7 +25,7 @@ Ollama接続先は実装内で `http://127.0.0.1:11434/api/chat` に固定され
 
 | 症状 | 確認すること |
 |---|---|
-| `ollama: command not found` | 公式Ollamaが導入済みでCLIを利用できるか。[公式macOS説明](https://docs.ollama.com/macos) を参照 |
+| `ollama: command not found` | [ルートREADMEのMac／WSL導入コマンド](../README.md#初回のみmacosでollama-cliを導入する)で既存CLI・サーバーを確認。未導入ならHomebrew導入済みを前提に `brew install ollama`。WSLは同READMEの公式Linuxインストーラー手順。導入済みならCLIのPATHを確認し、二重インストールしない |
 | `.venv/bin/python` がない | ルートREADMEのvenv作成を行ったか。カレントディレクトリがcloneのルートか |
 | `No module named mujoco` | 同じvenvのPythonで `-m pip install -r serving_robot/requirements-lock.txt` を行ったか |
 | 依存のインストールに失敗 | 検証済みPythonは3.9.6。別のPython/OSでの互換性は未検証。既存の他環境を上書きせず、エラーとバージョンを確認 |
