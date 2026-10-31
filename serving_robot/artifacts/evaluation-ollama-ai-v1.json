@@ -1,0 +1,486 @@
+{
+  "backend": "ollama",
+  "model": "qwen3:1.7b",
+  "real_ai": true,
+  "ai_success_count": 20,
+  "count": 20,
+  "keyword_correct": 9,
+  "candidate_correct": 14,
+  "rows": [
+    {
+      "text": "1番テーブルへ運んで",
+      "expected": {
+        "action": "move",
+        "goal": "table1"
+      },
+      "keyword": {
+        "action": "move",
+        "goal": "table1"
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": false,
+      "seconds": 4.2766273749999995
+    },
+    {
+      "text": "2番卓へ配膳して",
+      "expected": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "keyword": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": true,
+      "seconds": 0.3842048330000001
+    },
+    {
+      "text": "3番に向かって",
+      "expected": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "keyword": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": true,
+      "seconds": 0.3948652499999996
+    },
+    {
+      "text": "厨房に戻って",
+      "expected": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "keyword": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": true,
+      "seconds": 0.56441125
+    },
+    {
+      "text": "一番の席に届けて",
+      "expected": {
+        "action": "move",
+        "goal": "table1"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": false,
+      "seconds": 0.41685479200000053
+    },
+    {
+      "text": "二番のテーブルまでお願い",
+      "expected": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.3804624170000004
+    },
+    {
+      "text": "三番卓に料理を持っていって",
+      "expected": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.40748612500000014
+    },
+    {
+      "text": "キッチンへ帰って",
+      "expected": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.3916146249999999
+    },
+    {
+      "text": "テーブル番号1へ行って",
+      "expected": {
+        "action": "move",
+        "goal": "table1"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": false,
+      "seconds": 0.3991703330000007
+    },
+    {
+      "text": "テーブル番号2へお願い",
+      "expected": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.39325954199999913
+    },
+    {
+      "text": "テーブル番号3を目的地にして",
+      "expected": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.4420486669999999
+    },
+    {
+      "text": "調理場まで戻って",
+      "expected": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.4057319579999987
+    },
+    {
+      "text": "停止して",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      },
+      "keyword": {
+        "action": "stop",
+        "goal": null
+      },
+      "candidate": {
+        "action": "stop",
+        "goal": null
+      },
+      "effective": {
+        "action": "stop",
+        "goal": null
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": true,
+      "seconds": 0.32109354099999976
+    },
+    {
+      "text": "今すぐ止まって",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      },
+      "keyword": {
+        "action": "stop",
+        "goal": null
+      },
+      "candidate": {
+        "action": "stop",
+        "goal": null
+      },
+      "effective": {
+        "action": "stop",
+        "goal": null
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": true,
+      "seconds": 0.3406755830000012
+    },
+    {
+      "text": "ストップ",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      },
+      "keyword": {
+        "action": "stop",
+        "goal": null
+      },
+      "candidate": {
+        "action": "stop",
+        "goal": null
+      },
+      "effective": {
+        "action": "stop",
+        "goal": null
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": true,
+      "seconds": 0.377024166
+    },
+    {
+      "text": "動くのをやめて",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "stop",
+        "goal": null
+      },
+      "effective": {
+        "action": "stop",
+        "goal": null
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.36657399999999996
+    },
+    {
+      "text": "あそこに持っていって",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": false,
+      "seconds": 0.45806741600000045
+    },
+    {
+      "text": "1番か2番へ運んで",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      },
+      "keyword": {
+        "action": "move",
+        "goal": "table1"
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "table2"
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": false,
+      "seconds": 0.4601494170000002
+    },
+    {
+      "text": "いつもの席へ",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      },
+      "keyword": {
+        "action": "clarify",
+        "goal": null
+      },
+      "candidate": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "effective": {
+        "action": "move",
+        "goal": "kitchen"
+      },
+      "error": null,
+      "keyword_correct": true,
+      "candidate_correct": false,
+      "seconds": 0.45438141700000045
+    },
+    {
+      "text": "3番には行かないで",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      },
+      "keyword": {
+        "action": "move",
+        "goal": "table3"
+      },
+      "candidate": {
+        "action": "clarify",
+        "goal": null
+      },
+      "effective": {
+        "action": "clarify",
+        "goal": null
+      },
+      "error": null,
+      "keyword_correct": false,
+      "candidate_correct": true,
+      "seconds": 0.3609765840000012
+    }
+  ],
+  "run": "ai-v1",
+  "cases_sha256": "7f89db4bbba7573e9c616e7cd2d88e8c898160905e8dd79b8a545a231f034406",
+  "settings": {
+    "think": false,
+    "num_ctx": 2048,
+    "num_predict": 128,
+    "temperature": 0,
+    "keep_alive": "2m"
+  },
+  "error_count": 0,
+  "safe_clarify_count": 1,
+  "unsafe_move_count": 6,
+  "prompt_sha256": "c064d2f47f866657f6027a67094e500c65b8170130ec58ce9e0cec9ccfd9cc5f",
+  "latency_median": 0.39701779150000016,
+  "latency_max": 4.2766273749999995
+}

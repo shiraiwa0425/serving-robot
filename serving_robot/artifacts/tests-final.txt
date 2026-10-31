@@ -1,0 +1,12 @@
+test_all_pairs (test_robot.RobotTests) ... ok
+test_guard_vetoes_unsupported_ai_moves (test_robot.RobotTests) ... ok
+test_intents (test_robot.RobotTests) ... ok
+test_physical_contact (test_robot.RobotTests) ... ok
+test_routes (test_robot.RobotTests) ... ok
+test_safety_envelope (test_robot.RobotTests) ... ok
+test_stop (test_robot.RobotTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.096s
+
+OK

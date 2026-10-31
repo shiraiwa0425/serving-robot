@@ -1,0 +1,14 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><title>配膳ロボット・小さな実験室</title><style>
+body{font-family:system-ui;background:#101c2b;color:#e4edf8;max-width:1040px;margin:32px auto;padding:0 20px}h1{font-size:28px}main{display:grid;grid-template-columns:1.4fr 1fr;gap:24px}svg{background:#eaf1f5;border-radius:16px;width:100%}section{background:#1c2c40;padding:22px;border-radius:16px}input{width:94%;padding:12px;font-size:16px}button{padding:12px 20px;margin:12px 8px 12px 0;border:0;border-radius:8px;cursor:pointer}button.stop{background:#fdad90}pre{white-space:pre-wrap}small{color:#b9cadb}@media(max-width:700px){main{display:block}}</style>
+<h1>配膳ロボット・小さな実験室</h1><p>厨房から3つのテーブルへ。MuJoCo の物理状態を表示します。</p><main><svg viewBox="0 0 600 600" id="map" aria-label="厨房と3卓、ロボットの地図"></svg><section><strong id="backend"></strong><p>例：1番テーブルへ運んで<br>曖昧な指示は確認待ちになり、停止します。</p><form id="form"><input id="text" maxlength="500" placeholder="行先を入力" aria-label="配膳指示"><button>指示を送る</button></form><button class="stop" id="stop">停止</button><pre id="info"></pre><small>青：台車　橙：障害物　緑：計画経路<br>6 × 6 m、速度上限 0.35 m/s。<br>車輪・接客・音声・実機は対象外です。</small></section></main>
+<script>
+const $=id=>document.getElementById(id);const names={kitchen:'厨房',table1:'1番卓',table2:'2番卓',table3:'3番卓'};
+async function send(path,text=''){await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})})}
+$('form').onsubmit=e=>{e.preventDefault();send('/command',$('text').value)};$('stop').onclick=()=>send('/stop');
+async function draw(){try{let s=await(await fetch('/state')).json();$('backend').textContent=s.intent.backend==='mock'?'MOCK · 実 AI 未使用':'LOCAL AI · '+s.intent.model;$('info').textContent=`状態: ${s.status}\n速度: ${s.speed.toFixed(3)} m/s\n時刻: ${s.time.toFixed(1)} s\n${s.intent.message}\n解釈時間: ${s.intent.latency_seconds?.toFixed(2)??'—'} s`;
+let h='<rect x="3" y="3" width="594" height="594" rx="10" fill="none" stroke="#7f93a5" stroke-width="6"/>';
+for(let [x,y,w,d] of s.boxes)h+=`<rect x="${(x-w)*100}" y="${(6-y-d)*100}" width="${w*200}" height="${d*200}" fill="#e8ad6d" rx="4"/>`;
+for(let [k,[x,y]] of Object.entries(s.goals))h+=`<circle cx="${x*100}" cy="${(6-y)*100}" r="9" fill="#9db5c8"/><text x="${x*100-24}" y="${(6-y)*100-20}" font-size="16">${names[k]}</text>`;
+h+=`<polyline points="${s.path.map(([x,y])=>`${x*100},${(6-y)*100}`).join(' ')}" fill="none" stroke="#19a780" stroke-width="4"/><circle cx="${s.x*100}" cy="${(6-s.y)*100}" r="22" fill="#198bbd" stroke="white" stroke-width="4"/>`;$('map').innerHTML=h;
+}catch(e){$('info').textContent='サーバーに接続できません'}setTimeout(draw,100)}draw();
+</script></html>

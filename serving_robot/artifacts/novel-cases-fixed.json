@@ -1,0 +1,127 @@
+{
+  "policy": "Expected values frozen before the first inference. A single destination moves; negation/multiple/unknown clarify; explicit stop overrides a destination. No fine tuning. Related manually composed phrasing, not a representative independent population.",
+  "before_intent_sha256": "c6447bf676f3df1c919021832343428c0e43d26f94de9ac6087f4ee745e870e2",
+  "before_development_evaluate_sha256": "a15942e3784f1ff5b1a4f82d1a7d843675a6dc384c0ea83926f7c1995ab9ef57",
+  "cases": [
+    {
+      "category": "move",
+      "text": "料理を１番のテーブルに届けてもらえますか",
+      "expected": {
+        "action": "move",
+        "goal": "table1"
+      }
+    },
+    {
+      "category": "move",
+      "text": "お皿を二番卓まで運んでください",
+      "expected": {
+        "action": "move",
+        "goal": "table2"
+      }
+    },
+    {
+      "category": "move",
+      "text": "３号卓に向けて出発してください",
+      "expected": {
+        "action": "move",
+        "goal": "table3"
+      }
+    },
+    {
+      "category": "move",
+      "text": "配膳が終わったので調理場に帰還してください",
+      "expected": {
+        "action": "move",
+        "goal": "kitchen"
+      }
+    },
+    {
+      "category": "negative",
+      "text": "一番卓には近づかないでください",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "negative",
+      "text": "二番卓への移動は禁止です",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "multiple",
+      "text": "一番卓に寄って、それから三番卓へ届けて",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "multiple",
+      "text": "厨房と二番卓の両方に向かって",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "ambiguous",
+      "text": "お客さんが待っている席まで行って",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "ambiguous",
+      "text": "左側のテーブルに届けて",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "out_of_range",
+      "text": "四番卓へ配膳して",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "out_of_range",
+      "text": "テーブル12番へ向かって",
+      "expected": {
+        "action": "clarify",
+        "goal": null
+      }
+    },
+    {
+      "category": "stop_priority",
+      "text": "三番へ向かうのは中止。今すぐ止まって",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      }
+    },
+    {
+      "category": "stop_priority",
+      "text": "一番卓へ行って、いや、まず停止して",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      }
+    },
+    {
+      "category": "stop_priority",
+      "text": "停止。二番卓へはまだ動かないで",
+      "expected": {
+        "action": "stop",
+        "goal": null
+      }
+    }
+  ]
+}
