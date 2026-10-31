@@ -2,19 +2,26 @@
 
 日本語の指示をローカルQwen3で解釈し、MuJoCo上の配膳台車を動かすアプリです。「2番テーブルと3番テーブルの間へ」「1番の近くへ」「部屋の右上へ」などから候補と経路を表示し、利用者が確認してから移動します。
 
-以下は **macOS向けの利用手順**です。空間指定機能はmainに含まれています。コード・評価の詳細は [詳細README](serving_robot/README.md) を参照してください。
+以下は **MacとWSL 2（Ubuntu）向けの利用手順**です。空間指定機能はmainに含まれています。コード・評価の詳細は [詳細README](serving_robot/README.md) を参照してください。
 
 ## 1. 用意するもの
 
-**この手順は、Ollama・モデル・Python仮想環境がまだないMacで初めてcloneする場合を想定しています。** Ollamaはモデルを動かしてローカルAPIを提供するランタイム／サーバーで、指示を解釈するLLM本体は **Qwen3（`qwen3:1.7b`）** です。開発者の環境やclone外のフォルダには依存しません。
+**この手順は、Ollama・モデル・Python仮想環境がまだないMacまたはWSLで初めてcloneする場合を想定しています。** Ollamaはモデルを動かしてローカルAPIを提供するランタイム／サーバーで、指示を解釈するLLM本体は **Qwen3（`qwen3:1.7b`）** です。開発者の環境やclone外のフォルダには依存しません。
 
-- GitとPython。検証済みはApple M1・RAM 8 GB・macOS 27.0.1・Python 3.9.6です。Windows/Linuxや別のPythonバージョンでの導入は未検証です。
-- 実AIを使う場合は、公式の [Ollama](https://ollama.com/download/mac) を別途導入し、ターミナルで `ollama` コマンドを使用できるようにしてください。[macOSの公式導入説明](https://docs.ollama.com/macos) を参照してください。
+- GitとPython。検証済みはApple M1・RAM 8 GB・macOS 27.0.1・Python 3.9.6です。WSL 2（Ubuntu）や別のPythonバージョンでの導入は未検証です。
+- 実AIを使う場合はOllama CLIが必要です。未導入の場合のMac／WSL向けコマンドを下に記載しています。Homebrewを使う例は **Homebrew導入済み** が前提です。
 - 初回のPython依存・モデル取得にはインターネット接続が必要です。モデル `qwen3:1.7b` は約1.4 GBです。モデル・Ollama本体・仮想環境はこのリポジトリに含まれません。
 
 記録済みの構成はMuJoCo 3.2.7、NumPy 2.0.2、Ollama 0.40.11、Qwen3のQ4_K_M版です。Python依存は固定ファイルから導入します。新しいOllama等への互換性を保証するものではありません。
 
 ## 2. コードとPython環境を準備する
+
+WSLは **WSL 2とUbuntuを導入済み** とし、コマンドはすべてUbuntuターミナル内で実行します。OllamaもPythonアプリも同じWSL内で動かし、Windows側のOllamaには接続しません。WSL自体の導入は対象外です。UbuntuでGit・curl・Python・venvが未導入の場合は、最初に次を実行します（sudo権限とインターネット接続が必要）。
+
+```sh
+sudo apt-get update
+sudo apt-get install -y git curl python3 python3-venv python3-pip
+```
 
 例として `~/projects/serving-robot` にcloneします。別の場所を選ぶ場合は、以後の `cd` も同じ場所に読み替えてください。すでにclone済みならcloneを繰り返さず、そのリポジトリへ移動してください。
 
@@ -31,21 +38,71 @@ python3 -m venv .venv
 
 ## 3. 実AIで起動する
 
-### 初回のみ：公式Ollamaを導入する
+### 初回のみ：macOSでOllama CLIを導入する
 
-1. [公式macOSダウンロード](https://ollama.com/download/mac)から取得し、公式の案内に従ってOllamaをApplicationsへ配置して開きます。CLIのリンク作成を求められた場合は、内容を確認して設定します（[公式macOS説明](https://docs.ollama.com/macos)）。
-2. ターミナルで次を確認します。コマンドが見つからなければ、公式説明に従ってCLIの導入を確認してから進めてください。
+最初に既存CLIとサーバーを確認します。既存のOllamaがある場合は再インストールせず利用します。
+
+```sh
+command -v ollama
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/version
+```
+
+`command -v` がパスを返すなら導入済みです。APIだけ応答する場合もサーバーは既にあります。別の場所に導入済みのCLIを確認し、重複インストールしないでください。標準のmacOSアプリを導入済みでCLIがPATHにない場合は、次で **このターミナルだけ** CLIを使えます。
+
+```sh
+export PATH="/Applications/Ollama.app/Contents/Resources:$PATH"
+command -v ollama
+```
+
+**CLIもサーバーもなく、新規導入する場合だけ**、以下を実行します。この例はGUIアプリのcaskではなく、`ollama` コマンドを提供するHomebrew **formula** を使います。
+
+```sh
+if command -v ollama >/dev/null 2>&1; then
+  printf '%s\n' 'Ollama CLIは導入済みです。再インストールしません。'
+elif command -v brew >/dev/null 2>&1; then
+  brew install ollama
+else
+  printf '%s\n' 'Homebrewが見つかりません。この手順はHomebrew導入済みが前提です。'
+fi
+```
+
+Homebrew自体がない場合は、[Homebrew公式導入案内](https://brew.sh/)で前提条件を確認して準備してから戻ってください。上記はHomebrewを自動導入せず、`brew services start` による自動起動も設定しません。[formulaの現行情報](https://formulae.brew.sh/formula/ollama)で対応OS・CPUを確認できます。環境に対応するバイナリがない場合、ソースビルドが必要になることがあります。
+
+導入後にCLIを確認します。見つからない場合は、モデル取得へ進む前にHomebrewのPATH設定を確認してください。
 
 ```sh
 command -v ollama
 ollama --version
 ```
 
-公式の現行macOS要件はSonoma 14以降で、Apple Mシリーズとx86（CPUのみ）です。本アプリの動作確認環境は上記のM1のみで、他のOS・CPUや最新Ollamaでの通し試験は未実施です。ローカルモデルを使うため、クラウド用のサインインやAPIキーは不要です。
+Ollama公式macOSアプリの現行要件はSonoma 14以降ですが、Homebrew formulaの対応範囲はformulaの現行情報で別途確認してください。
+
+### 初回のみ：WSL 2（Ubuntu）でOllamaを導入する
+
+Ubuntuターミナルで既存CLIとサーバーを確認します。どちらかが存在する場合は導入先を確認し、再インストールしないでください。
+
+```sh
+command -v ollama
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/version
+```
+
+**両方が未導入の場合だけ**、同じUbuntu内で公式Linuxインストーラーを実行します。これはWSL内のLinux用で、Macでは実行しません。
+
+```sh
+if curl -fsSL https://ollama.com/install.sh -o /tmp/serving-robot-ollama-install.sh; then
+  sh /tmp/serving-robot-ollama-install.sh
+fi
+command -v ollama
+ollama --version
+```
+
+これは[公式Linux導入コマンド](https://docs.ollama.com/linux)のスクリプトを保存してから実行する形です。システムへの導入にsudo権限を使い、環境によってサービス作成・起動も行います。実行前にスクリプトを確認してください。GPUやsystemdの状態により挙動が異なるため、導入後は必ず下記API確認を行い、応答するなら `ollama serve` を重ねて実行しません。
+
+以降のモデル取得・起動・確認はMac／WSLで共通です。WSLでは引き続き同じUbuntu内で実行します。ローカルモデルを使うためクラウド用のサインインやAPIキーは不要です。今回のHomebrew導入例・WSL導入・最新Ollamaでの通し試験は未実施です。
 
 ### ターミナル1：Ollamaサーバー
 
-まず、すでに同じMacでOllamaが動いているか確認します。
+まず、すでに同じ環境（Mac、または同じWSL Ubuntu）でOllamaが動いているか確認します。
 
 ```sh
 curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/version
@@ -100,11 +157,11 @@ curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/tags
 
 接続の流れは **ブラウザ → Pythonアプリ（127.0.0.1:8767）→ Ollama（127.0.0.1:11434）→ Qwen3** です。`OLLAMA_HOST` はOllama CLI／サーバー向けで、アプリ自身の接続先は実装上11434に固定されています。
 
-`http://127.0.0.1:8767 backend=ollama` と表示されたら、**同じMacのブラウザ**で次を開きます。
+`http://127.0.0.1:8767 backend=ollama` と表示されたら、**Macのブラウザ、またはWSLを動かしているWindowsのブラウザ**で次を開きます。
 
 **http://127.0.0.1:8767/**
 
-画面に `LOCAL AI · qwen3:1.7b` と出れば実AIモードです。`localhost` は見ている端末自身を意味するので、別のiPhone/PCから同じURLを開くことはできません。この手順はネットワーク公開を設定しません。
+画面に `LOCAL AI · qwen3:1.7b` と出れば実AIモードです。WSLでは通常、WindowsのブラウザからWSL内のWebアプリをlocalhostで開けます（[WSL公式ネットワーク説明](https://learn.microsoft.com/en-us/windows/wsl/networking)）。開けない場合はWSLのlocalhost転送状態を確認してください。OllamaとPythonは同じWSL内なので、相互接続のIP変更や外部公開は不要です。`localhost` は見ている端末自身を意味するので、別のiPhone/PCから同じURLを開くことはできません。この手順はネットワーク公開を設定しません。
 
 ### AIなしで画面・制御だけを試す場合
 
