@@ -6,6 +6,8 @@
 
 ## 1. 用意するもの
 
+**この手順は、Ollama・モデル・Python仮想環境がまだないMacで初めてcloneする場合を想定しています。** Ollamaはモデルを動かしてローカルAPIを提供するランタイム／サーバーで、指示を解釈するLLM本体は **Qwen3（`qwen3:1.7b`）** です。開発者の環境やclone外のフォルダには依存しません。
+
 - GitとPython。検証済みはApple M1・RAM 8 GB・macOS 27.0.1・Python 3.9.6です。Windows/Linuxや別のPythonバージョンでの導入は未検証です。
 - 実AIを使う場合は、公式の [Ollama](https://ollama.com/download/mac) を別途導入し、ターミナルで `ollama` コマンドを使用できるようにしてください。[macOSの公式導入説明](https://docs.ollama.com/macos) を参照してください。
 - 初回のPython依存・モデル取得にはインターネット接続が必要です。モデル `qwen3:1.7b` は約1.4 GBです。モデル・Ollama本体・仮想環境はこのリポジトリに含まれません。
@@ -29,17 +31,31 @@ python3 -m venv .venv
 
 ## 3. 実AIで起動する
 
+### 初回のみ：公式Ollamaを導入する
+
+1. [公式macOSダウンロード](https://ollama.com/download/mac)から取得し、公式の案内に従ってOllamaをApplicationsへ配置して開きます。CLIのリンク作成を求められた場合は、内容を確認して設定します（[公式macOS説明](https://docs.ollama.com/macos)）。
+2. ターミナルで次を確認します。コマンドが見つからなければ、公式説明に従ってCLIの導入を確認してから進めてください。
+
+```sh
+command -v ollama
+ollama --version
+```
+
+公式の現行macOS要件はSonoma 14以降で、Apple Mシリーズとx86（CPUのみ）です。本アプリの動作確認環境は上記のM1のみで、他のOS・CPUや最新Ollamaでの通し試験は未実施です。ローカルモデルを使うため、クラウド用のサインインやAPIキーは不要です。
+
 ### ターミナル1：Ollamaサーバー
 
 まず、すでに同じMacでOllamaが動いているか確認します。
 
 ```sh
-curl --silent --fail http://127.0.0.1:11434/api/version
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/version
 ```
 
 バージョンが返る場合は二重起動せず、その既存サーバーを利用するか、管理している人に設定を確認してください。下の環境変数は、新しく起動するサーバーにだけ反映されます。既存アプリやサービスを勝手に停止する必要はありません。
 
-応答がなく、新しくサーバーを起動する場合：
+Ollamaアプリを開いたことで既に応答する場合もあります。応答があるなら `ollama serve` を追加実行せず、次の「ターミナル2」へ進みます。応答がなければアプリの起動状態・エラーを確認し、サーバーが未起動の場合だけ、次のCLI起動例を使います。タイムアウトや不明な応答の場合は、二重起動を試す前に既存サービスの状態を確認してください。
+
+新しくCLIからサーバーを起動する場合：
 
 ```sh
 cd ~/projects/serving-robot
@@ -62,11 +78,27 @@ ollama serve
 ```sh
 cd ~/projects/serving-robot
 export OLLAMA_HOST=127.0.0.1:11434
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/version
 ollama pull qwen3:1.7b
+ollama list
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/tags
+```
+
+`api/version` でJSONのバージョン応答が返ること、`ollama list` のNAME列と `api/tags` のmodelsに **`qwen3:1.7b`** があることを確認します。接続エラーや取得失敗の場合は、アプリ起動へ進まずOllama側を確認してください。`models: []` はサーバー接続は成功していますがモデル未取得です。
+
+`ollama pull` はOllamaの配布元からモデルを取得します。Hugging Faceから別途ファイルを直接ダウンロードしたり、Python用のOllama SDKを追加導入したりする必要はありません。このアプリはPython標準ライブラリでローカルAPIへ接続します。
+
+`ollama pull` はモデル取得用です。同じモデルを取得済みなら省略できます。モデルの保存先はOllamaサーバー側の設定によります。通常起動のたびにモデルをダウンロードする必要はありません。
+
+モデル名は可変タグであり、将来も同じ配布内容とは限りません。新しい環境の `ollama --version` と `ollama list` のモデルIDを記録し、過去の評価と区別してください。
+
+接続とモデルを確認できたら、同じターミナル2・cloneのルートで実AIアプリを起動します。
+
+```sh
 .venv/bin/python -B serving_robot/app.py --backend ollama --model qwen3:1.7b --port 8767
 ```
 
-`ollama pull` はモデル取得用です。同じモデルを取得済みなら省略できます。モデルの保存先はOllamaサーバー側の設定によります。通常起動のたびにモデルをダウンロードする必要はありません。
+接続の流れは **ブラウザ → Pythonアプリ（127.0.0.1:8767）→ Ollama（127.0.0.1:11434）→ Qwen3** です。`OLLAMA_HOST` はOllama CLI／サーバー向けで、アプリ自身の接続先は実装上11434に固定されています。
 
 `http://127.0.0.1:8767 backend=ollama` と表示されたら、**同じMacのブラウザ**で次を開きます。
 
@@ -121,4 +153,4 @@ cd ~/projects/serving-robot
 - 固定の6×6 m地図と既知の自己位置が前提です。カメラSLAM、任意座標、実機、自由な位置関係は未対応です。実機での安全は保証しません。
 - 空間機能の開発22例はAI素出力15/22、検査後22/22です。一般的な日本語理解の精度を示すものではありません。過去の比較・失敗・試験記録は [詳細README](serving_robot/README.md) にまとめています。
 
-**このREADME改善案の導入コマンドは、コードCLIとの静的照合のみ行っています。新規clone・依存導入・モデル取得からの一連の動作試験は未実施です。**
+**このREADMEの導入コマンドは、コードCLIとの静的照合のみ行っています。新規clone・依存導入・モデル取得からの一連の動作試験は未実施です。**
