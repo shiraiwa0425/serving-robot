@@ -1,0 +1,712 @@
+{
+  "run": "v2",
+  "model": "qwen3:1.7b",
+  "count": 22,
+  "final_correct": 22,
+  "raw_correct": 15,
+  "unsafe_moves": 0,
+  "errors": 0,
+  "median_seconds": 0.6033666875000003,
+  "max_seconds": 0.9821931250000002,
+  "prompt_sha256": "305d5899816bbd0dae84865bde81422c56326176b63cf48542fc282b77780865",
+  "cases_sha256": "25382bdb0a805473ff7c7ebe08e63f2a4605de4ac5a2a4f2eb7ce65f198e110f",
+  "rows": [
+    {
+      "text": "2番テーブルと3番テーブルの間へ",
+      "expected": {
+        "action": "move",
+        "relation": "between",
+        "landmarks": [
+          "table2",
+          "table3"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table2",
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table2",
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.793016917,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "1番と2番の間へ",
+      "expected": {
+        "action": "move",
+        "relation": "between",
+        "landmarks": [
+          "table1",
+          "table2"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table1",
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table1",
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.6087302909999999,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "三番と一番の間へ",
+      "expected": {
+        "action": "move",
+        "relation": "between",
+        "landmarks": [
+          "table1",
+          "table3"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table1",
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table1",
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.6322118750000001,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "1番の近くへ",
+      "expected": {
+        "action": "move",
+        "relation": "near",
+        "landmarks": [
+          "table1"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table1"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table1"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5734187500000001,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "二番のそばに来て",
+      "expected": {
+        "action": "move",
+        "relation": "near",
+        "landmarks": [
+          "table2"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5712594589999997,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "三番の付近までお願い",
+      "expected": {
+        "action": "move",
+        "relation": "near",
+        "landmarks": [
+          "table3"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5716086250000001,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "部屋の右上へ",
+      "expected": {
+        "action": "move",
+        "relation": "corner",
+        "landmarks": [],
+        "corner": "top_right"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "top_right"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "top_right"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5606810420000001,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "左上の角へ",
+      "expected": {
+        "action": "move",
+        "relation": "corner",
+        "landmarks": [],
+        "corner": "top_left"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "top_left"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "top_left"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5427639580000001,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "右下の角に行こう",
+      "expected": {
+        "action": "move",
+        "relation": "corner",
+        "landmarks": [],
+        "corner": "bottom_right"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "bottom_right"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "bottom_right"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5430333330000003,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "部屋の左下へ",
+      "expected": {
+        "action": "move",
+        "relation": "corner",
+        "landmarks": [],
+        "corner": "bottom_left"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "bottom_left"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "bottom_left"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5234217079999999,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "一番へ配膳して",
+      "expected": {
+        "action": "move",
+        "relation": "landmark",
+        "landmarks": [
+          "table1"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table1"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table1"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5841817499999999,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "2番テーブルへ運んで",
+      "expected": {
+        "action": "move",
+        "relation": "landmark",
+        "landmarks": [
+          "table2"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.5724906670000003,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "三番卓に届けて",
+      "expected": {
+        "action": "move",
+        "relation": "landmark",
+        "landmarks": [
+          "table3"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.622352459,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "厨房へ戻って",
+      "expected": {
+        "action": "move",
+        "relation": "landmark",
+        "landmarks": [
+          "kitchen"
+        ],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "kitchen"
+          ],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "kitchen"
+          ],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.7103835830000005,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "2番と3万の間へ",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table2",
+            "table3"
+          ],
+          "corner": "none"
+        },
+        "reason": "text_evidence_disagrees"
+      },
+      "error": null,
+      "seconds": 0.6809392499999998,
+      "final_correct": true,
+      "raw_correct": false
+    },
+    {
+      "text": "12番の近くへ",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table1"
+          ],
+          "corner": "none"
+        },
+        "reason": "text_evidence_disagrees"
+      },
+      "error": null,
+      "seconds": 0.6047838750000007,
+      "final_correct": true,
+      "raw_correct": false
+    },
+    {
+      "text": "どこかの角へ",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "reason": "invalid_model_relation"
+      },
+      "error": null,
+      "seconds": 0.5595748339999993,
+      "final_correct": true,
+      "raw_correct": false
+    },
+    {
+      "text": "右上か左下へ",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "corner",
+          "landmarks": [],
+          "corner": "top_right"
+        },
+        "reason": "text_evidence_disagrees"
+      },
+      "error": null,
+      "seconds": 0.9821931250000002,
+      "final_correct": true,
+      "raw_correct": false
+    },
+    {
+      "text": "1番の右隣へ",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "near",
+          "landmarks": [
+            "table1"
+          ],
+          "corner": "none"
+        },
+        "reason": "text_evidence_disagrees"
+      },
+      "error": null,
+      "seconds": 0.6856380829999988,
+      "final_correct": true,
+      "raw_correct": false
+    },
+    {
+      "text": "1番と2番と3番の間へ",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "between",
+          "landmarks": [
+            "table1",
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "reason": "text_evidence_disagrees"
+      },
+      "error": null,
+      "seconds": 0.7603310000000008,
+      "final_correct": true,
+      "raw_correct": false
+    },
+    {
+      "text": "2番には行かないで",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "reason": null
+      },
+      "error": null,
+      "seconds": 0.6019494999999999,
+      "final_correct": true,
+      "raw_correct": true
+    },
+    {
+      "text": "座標(2,3)に向かって",
+      "expected": {
+        "action": "clarify",
+        "relation": "none",
+        "landmarks": [],
+        "corner": "none"
+      },
+      "details": {
+        "final": {
+          "action": "clarify",
+          "relation": "none",
+          "landmarks": [],
+          "corner": "none"
+        },
+        "raw": {
+          "action": "move",
+          "relation": "landmark",
+          "landmarks": [
+            "table2"
+          ],
+          "corner": "none"
+        },
+        "reason": "text_evidence_disagrees"
+      },
+      "error": null,
+      "seconds": 0.625811916,
+      "final_correct": true,
+      "raw_correct": false
+    }
+  ]
+}

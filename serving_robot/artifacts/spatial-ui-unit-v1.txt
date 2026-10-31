@@ -1,0 +1,1 @@
+PASS: candidate display, explicit confirmation, double click, pending-command stale poll suppression, fresh candidate, cancel, stop
