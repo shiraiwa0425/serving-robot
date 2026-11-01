@@ -67,3 +67,85 @@ rejectState(new Error('old poll'));await oldPoll;
 assert.equal(element('error').textContent,'新しい操作のエラー');
 element('stop').onclick();await flush();assert.equal(element('error').textContent,'');
 console.log('PASS: accessible inline clarify, text-only messages, recovery, HTTP errors, new-state clearing, stale command/poll errors after stop/cancel');
+
+// Deferred fetches expose the UI while requests (and response bodies) are pending.
+const pendingMessage='指示を解釈して候補を作成中です…';
+assert.match(html, /#error\.pending\{color:#b9cadb\}/);
+async function pendingHarness(){
+ const nodes=new Map(),requests=[],polls=[];
+ const node=id=>{if(!nodes.has(id))nodes.set(id,{disabled:false,hidden:true,textContent:'',innerHTML:'',className:'',value:''});return nodes.get(id);};
+ const state={epoch:1,x:.7,y:.7,speed:0,status:'clarify',time:1,path:[],goals:{},boxes:[],candidate:null,intent:{backend:'mock',action:'clarify',message:'以前の確認メッセージ'}};
+ let deferPoll=false;
+ const ctx=vm.createContext({document:{getElementById:node},setTimeout:()=>{},fetch:(path,options)=>{
+  if(path==='/state'&&!deferPoll)return Promise.resolve({json:async()=>structuredClone(state)});
+  return new Promise((resolve,reject)=>(path==='/state'?polls:requests).push({path,options,resolve,reject}));
+ }});
+ vm.runInContext(html.split('<script>')[1].split('</script>')[0],ctx);await flush();
+ return {node,requests,polls,state,submit(){node('text').value='一番卓へ';node('form').onsubmit({preventDefault(){}});return requests.at(-1);},
+  poll(){return vm.runInContext('draw()',ctx);},deferPoll(){deferPoll=true;},
+  cancel(){return vm.runInContext("send('/cancel',{candidate_id:'old'})",ctx);}};
+}
+const expectPending=h=>{assert.equal(h.node('error').textContent,pendingMessage);assert.equal(h.node('error').className,'pending');assert.equal(h.node('proposal').hidden,true);assert.equal(h.node('confirm').disabled,true);assert.equal(h.node('stop').disabled,false);};
+const expectClear=h=>{assert.equal(h.node('error').textContent,'');assert.equal(h.node('error').className,'');};
+{
+ const h=await pendingHarness(),request=h.submit();expectPending(h);
+ await h.poll();expectPending(h); // Unchanged/clarify state must not erase pending feedback.
+ let resolveBody;request.resolve({ok:true,json:()=>new Promise(resolve=>resolveBody=resolve)});await flush();expectPending(h);
+ resolveBody({ok:true});await flush();expectClear(h);
+ h.state.epoch++;h.state.status='awaiting_confirmation';h.state.intent={backend:'mock',action:'candidate',message:'確認してください'};
+ h.state.candidate={id:'fresh',point:[1,1],label:'1番テーブル',path:[],explanation:'候補'};
+ await h.poll();expectClear(h);assert.equal(h.node('proposal').hidden,false);assert.equal(h.node('confirm').disabled,false);
+}
+for(const failure of ['http','network','json']){
+ const h=await pendingHarness(),request=h.submit();expectPending(h);
+ if(failure==='http')request.resolve(response('入力を確認してください'));
+ if(failure==='network')request.reject(new Error('offline'));
+ if(failure==='json')request.resolve({ok:true,json:async()=>{throw new Error('invalid JSON');}});
+ await flush();assert.notEqual(h.node('error').textContent,pendingMessage);assert.ok(h.node('error').textContent);assert.equal(h.node('error').className,'');
+ const retry=h.submit();expectPending(h);retry.resolve(response());await flush();expectClear(h);
+}
+for(const action of ['stop','cancel'])for(const lateResult of ['success','http','network']){
+ const h=await pendingHarness(),old=h.submit();expectPending(h);
+ // Cancel is hidden during a command; exercise the shared mutation path without
+ // changing that safety behavior. Stop remains a directly available UI action.
+ if(action==='stop')h.node('stop').onclick();else h.cancel();
+ expectClear(h);h.requests.at(-1).resolve(response());await flush();expectClear(h);
+ if(lateResult==='network')old.reject(new Error('old failure'));else old.resolve(response(lateResult==='http'?'old error':null));
+ await flush();expectClear(h);
+}
+for(const olderFinishesFirst of [true,false])for(const oldFails of [true,false]){
+ const h=await pendingHarness(),old=h.submit(),latest=h.submit();expectPending(h);
+ if(olderFinishesFirst){old.resolve(response(oldFails?'old error':null));await flush();expectPending(h);latest.resolve(response());}
+ else{latest.resolve(response());await flush();expectClear(h);old.resolve(response(oldFails?'old error':null));}
+ await flush();expectClear(h);
+}
+for(const pollFails of [true,false]){
+ const h=await pendingHarness();h.deferPoll();const oldPoll=h.poll(),request=h.submit();expectPending(h);
+ if(pollFails)h.polls[0].reject(new Error('stale poll'));else h.polls[0].resolve({json:async()=>h.state});
+ await oldPoll;expectPending(h);
+ const duringPoll=h.poll();request.resolve(response());await flush();expectClear(h);
+ h.node('stop').onclick();h.requests.at(-1).resolve(response());await flush();expectClear(h);
+ // Even a response that began during the command cannot restore old feedback
+ // after the newer stop has settled.
+ if(pollFails)h.polls[1].reject(new Error('stale poll'));else h.polls[1].resolve({json:async()=>h.state});
+ await duringPoll;expectClear(h);
+}
+console.log('PASS: immediate neutral pending feedback, deferred body, success, HTTP/network/JSON failure, retry, stop/cancel, out-of-order commands and stale poll success/failure');
+
+// A poll begun during a command is stale even if it arrives after that command.
+for(const pollFails of [true,false]){
+ const h=await pendingHarness(),request=h.submit();h.deferPoll();const poll=h.poll();
+ request.resolve(response());await flush();expectClear(h);
+ if(pollFails)h.polls[0].reject(new Error('poll started while pending'));
+ else h.polls[0].resolve({json:async()=>h.state});
+ await poll;expectClear(h);assert.equal(h.node('proposal').hidden,true);
+}
+console.log('PASS: polls begun during mutation cannot restore obsolete feedback after settlement');
+// An older completion also cannot erase the newest request's failure.
+{
+ const h=await pendingHarness(),old=h.submit(),latest=h.submit();
+ latest.resolve(response('最新の入力エラー'));await flush();
+ old.resolve(response());await flush();
+ assert.equal(h.node('error').textContent,'最新の入力エラー');assert.equal(h.node('error').className,'');
+}
+console.log('PASS: older success cannot erase the latest command error');
