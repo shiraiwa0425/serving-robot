@@ -4,7 +4,7 @@
 
 ## 1. 初回セットアップ
 
-Mac、または導入済みの **WSL 2＋Ubuntu** を使います。Git・Python・curlとインターネット接続が必要です。モデルは約1.4 GB。Homebrewは不要です。
+Mac、または導入済みの **WSL 2＋Ubuntu** を使います。Git・Python・curlとインターネット接続が必要です。モデルは約1.4 GB。
 
 WSLでは、以下を含めすべてUbuntuターミナルで実行し、Ollamaとアプリを同じUbuntu内で動かします。必要なツールがなければ先に準備します。
 
