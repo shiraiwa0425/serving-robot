@@ -4,6 +4,12 @@
 
 初回セットアップでは、Ollama（推論ランタイム／サーバー）の導入、LLM `qwen3:1.7b` の取得、11434への接続とモデル一覧の確認、clone内のPython仮想環境作成が必要です。[ルートREADMEの初回セットアップ](../README.md#3-実aiで起動する)を順に実行してください。開発者が用意したOllamaや親フォルダは不要で、Hugging Faceからの直接ダウンロードも不要です。
 
+Mac／WSLでOllamaが未導入の場合だけ、公式コマンドで導入します。導入済みかの確認とインストーラーの変更内容は、ルートREADMEを参照してください。
+
+```sh
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
 ## コマンドと実行場所
 
 アプリを起動するときはリポジトリのルートで、clone内に作った仮想環境を指定します。
@@ -25,7 +31,7 @@ Ollama接続先は実装内で `http://127.0.0.1:11434/api/chat` に固定され
 
 | 症状 | 確認すること |
 |---|---|
-| `ollama: command not found` | [ルートREADMEのMac／WSL導入コマンド](../README.md#初回のみmacosでollama-cliを導入する)で既存CLI・サーバーを確認。未導入ならHomebrew導入済みを前提に `brew install ollama`。WSLは同READMEの公式Linuxインストーラー手順。導入済みならCLIのPATHを確認し、二重インストールしない |
+| `ollama: command not found` | [ルートREADMEの共通導入手順](../README.md#初回のみollamaを導入するmacwsl共通)で既存CLI・サーバーを確認。未導入の場合だけ上記の公式インストールコマンドを実行。導入済みならCLIのPATHを確認し、二重インストールしない |
 | `.venv/bin/python` がない | ルートREADMEのvenv作成を行ったか。カレントディレクトリがcloneのルートか |
 | `No module named mujoco` | 同じvenvのPythonで `-m pip install -r serving_robot/requirements-lock.txt` を行ったか |
 | 依存のインストールに失敗 | 検証済みPythonは3.9.6。別のPython/OSでの互換性は未検証。既存の他環境を上書きせず、エラーとバージョンを確認 |
