@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+// The stop label changes without hiding, disabling, or restyling the control.
+assert.ok(html.includes('<button class="stop" id="stop">走行中の停止</button>'));
 // Keep native input-history suggestions disabled without changing text entry.
 assert.match(html, /<form\b[^>]*\bid="form"[^>]*\bautocomplete="off"/);
 assert.match(html, /<input\b[^>]*\bid="text"[^>]*\bautocomplete="off"/);
