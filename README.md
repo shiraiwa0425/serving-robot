@@ -6,12 +6,19 @@
 
 Mac、または導入済みの **WSL 2＋Ubuntu** を使います。Git・Python・curlとインターネット接続が必要です。モデルは約1.4 GB。
 
+### WSL 2＋Ubuntuのみ：必要なツールを準備
+
+**Macでは実行不要です。次の「Mac・WSL共通」へ進んでください。**
+
 WSLでは、以下を含めすべてUbuntuターミナルで実行し、Ollamaとアプリを同じUbuntu内で動かします。必要なツールがなければ先に準備します。
 
 ```sh
+# WSL 2＋Ubuntu専用。Macでは実行しません。
 sudo apt-get update
 sudo apt-get install -y git curl zstd python3 python3-venv python3-pip
 ```
+
+### Mac・WSL共通：cloneとPython環境を準備
 
 コードとPython環境を準備します。clone済みなら、そのフォルダへ移動してください。
 
