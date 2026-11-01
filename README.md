@@ -20,11 +20,9 @@ sudo apt-get install -y git curl zstd python3 python3-venv python3-pip
 
 ### Mac・WSL共通：cloneとPython環境を準備
 
-コードとPython環境を準備します。clone済みなら、そのフォルダへ移動してください。
+保存したいフォルダで実行してください。clone済みなら、そのリポジトリへ移動してPython環境の準備から進めてください。
 
 ```sh
-mkdir -p ~/projects
-cd ~/projects
 git clone https://github.com/shiraiwa0425/serving-robot.git
 cd serving-robot
 python3 -m venv .venv
@@ -53,10 +51,9 @@ OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 ollama serve
 
 ## 3. モデルを取得してアプリを起動する（ターミナル2）
 
-別ターミナルを開き、**cloneしたフォルダ**で実行します。別の場所へcloneした場合は `cd` を読み替えてください。
+別ターミナルを開き、**cloneした `serving-robot` フォルダへ移動してから**実行します。
 
 ```sh
-cd ~/projects/serving-robot
 export OLLAMA_HOST=127.0.0.1:11434
 ollama pull qwen3:1.7b
 ollama list
