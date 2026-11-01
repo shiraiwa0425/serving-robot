@@ -114,10 +114,10 @@ AIは `landmark / between / near / corner` とランドマークを構造化し�
 
 最終差分の26テスト（回帰7・空間/物理/確認15・HTTP4）とUI状態テスト、実AI統合6ケースの保存記録があります。[最終テスト](artifacts/spatial-release-tests.txt)、[UI状態テスト](artifacts/spatial-release-ui.txt)、[実AI統合](artifacts/spatial-live-v1.json) を参照。
 
-テストを自分で実行する場合は、clone内のvenvを準備し、次のブロックだけ `serving_robot` ディレクトリで実行します。
+テストを自分で実行する場合は、clone内のvenvを準備し、cloneのルートから次を実行します。
 
 ```sh
-cd ~/projects/serving-robot/serving_robot
+cd serving_robot
 ../.venv/bin/python -B -m unittest -v test_robot test_spatial test_spatial_http
 ```
 
