@@ -33,7 +33,7 @@ class Session:
                     proposal['id']=uuid.uuid4().hex;self.pending=proposal;self.sim.status='awaiting_confirmation'
                     self.last.update(action='candidate',message=proposal['label']+'：候補を確認してください。まだ移動していません。')
                 elif spec['action']=='stop':self.sim.stop();self.last.update(action='stop',message='停止しました。')
-                else:self.sim.status='clarify';self.last.update(action='clarify',message='行先・関係を特定できません。既知のテーブル、間・近く、画面の四隅を一つ指定してください。')
+                else:self.sim.status='clarify';self.last.update(action='clarify',message='行先・関係を確認できません。1〜3番テーブルを指定してください（例：一番卓へ／1番と2番の間へ／3番の近くへ）。厨房や画面の右上なども指定できます。誤記や複数の行先は一つの指示に直してください。')
         except Exception as exc:
             with self.lock:
                 if epoch!=self.epoch:return

@@ -9,6 +9,8 @@ CORNERS=['top_left','top_right','bottom_left','bottom_right']
 SCHEMA={'type':'object','properties':{'action':{'type':'string','enum':['move','stop','clarify']},'relation':{'type':'string','enum':['landmark','between','near','corner','none']},'landmarks':{'type':'array','items':{'type':'string','enum':GOALS},'maxItems':2},'corner':{'type':'string','enum':CORNERS+['none']}},'required':['action','relation','landmarks','corner'],'additionalProperties':False}
 PROMPT='''配膳ロボットの文を空間関係JSONに分類。座標は生成しない。
 厨房/キッチン/調理場=kitchen、1番/一番=table1、2番/二番=table2、3番/三番=table3。
+「番テーブル」「番卓」「番のテーブル」「番の卓」は同じ行先。算用数字と漢数字の一・二・三も同じ。
+一番テーブル/一番卓/1番テーブル/1番卓=table1。2番・3番も同様。表記の違いだけで確認要求にしない。
 action move: relation=landmark は行先1つ、between は異なるテーブル2つの間、near はテーブル1つの近く、corner は画面の四隅。
 corner: 左上=top_left、右上=top_right、左下=bottom_left、右下=bottom_right。他の場合none。
 landmarksはlandmark/nearなら1要素、betweenなら2要素、cornerなら空配列。
@@ -21,6 +23,19 @@ landmarksはlandmark/nearなら1要素、betweenなら2要素、cornerなら空�
 例「適当な角へ」=>{"action":"clarify","relation":"none","landmarks":[],"corner":"none"}
 '''
 
+# Consume the complete number and optional table noun, never a valid suffix of
+# an unknown number (e.g. 十一番, 1.2番 or -1番).
+NUMBER=r'[+\-]?[0-9〇零一二三四五六七八九十百千万億兆]+(?:\.[0-9]+)?'
+TABLE_REFERENCE=re.compile(r'テーブル(?:番号)?\s*(?P<prefix>'+NUMBER+r')|(?P<suffix>'+NUMBER+r')\s*(?:番|号)(?:の?(?:テーブル|卓|席))?')
+TABLE_NUMBERS={'一':'1','二':'2','三':'3','1':'1','2':'2','3':'3'}
+
+def canonical_table_names(text):
+    """Canonical spelling for model input only; original text still guards output."""
+    def replace(match):
+        number=TABLE_NUMBERS.get(match.group('prefix') or match.group('suffix'))
+        return number+'番テーブル' if number else match.group(0)
+    return TABLE_REFERENCE.sub(replace,unicodedata.normalize('NFKC',text))
+
 def empty(action='clarify'):
     return dict(action=action,relation='none',landmarks=[],corner='none')
 
@@ -32,14 +47,19 @@ def evidence(text):
     if not t or len(t)>500:return empty()
     if stop_requested(t):return empty('stop')
     if re.search(r'ない|禁止|行くな|ずに|ではなく|じゃなく|除く|以外|たら|なら|場合|いつも|あそこ|無視|システム|座標|[xyXY]\s*=|\d万|どこ|どちら|どれ|適当|たぶん|多分|かもしれ|おそらく|それとも|または|もしくは|後で|それから|順に',t):return empty()
+    if re.search(r'(?:番|テーブル|卓|席)\s*か(?!ら)',t):return empty()
     # Parse complete numeric tokens: 12番 must never be truncated to 2番.
     refs=[];invalid=False
-    matches=re.finditer(r'テーブル(?:番号)?\s*(\d+)|(?<!\d)(\d+)\s*(?:番|号)|([一二三四五六七八九十]+)(?:番|号)',t)
+    matches=list(TABLE_REFERENCE.finditer(t))
     for m in matches:
-        value=m.group(1) or m.group(2) or m.group(3)
-        number={'一':'1','二':'2','三':'3'}.get(value,value)
-        if number not in ['1','2','3']:invalid=True
+        number=TABLE_NUMBERS.get(m.group('prefix') or m.group('suffix'))
+        if (number is None or re.match(r'[A-Za-z0-9_]|\.\d',t[m.end():])
+                or (m.start()>0 and re.match(r'[A-Za-z0-9_.+\-−]',t[m.start()-1]))):invalid=True
         else:refs.append('table'+number)
+    # A remaining table noun/number marker is not a second, guessed destination.
+    # Reject incomplete names even alongside a valid landmark or corner.
+    remainder=TABLE_REFERENCE.sub('',t)
+    if re.search(r'テーブル|卓|席|番|号',remainder):invalid=True
     if any(w in t for w in ['厨房','キッチン','調理場']):refs.append('kitchen')
     refs=sorted(set(refs));corners=[c for w,c in [('左上','top_left'),('右上','top_right'),('左下','bottom_left'),('右下','bottom_right')] if w in t]
     if invalid or len(corners)>1 or (corners and refs):return empty()
@@ -48,7 +68,7 @@ def evidence(text):
     between='間' in t;near=bool(re.search(r'近く|そば|付近|周辺|近辺',t))
     if between and near:return empty()
     if between:
-        if len(refs)!=2 or 'kitchen' in refs or re.search(r'番\s*か|卓\s*か|席\s*か',t):return empty()
+        if len(refs)!=2 or 'kitchen' in refs:return empty()
         relation='between'
     elif near:
         if len(refs)!=1 or refs==['kitchen']:return empty()
@@ -77,7 +97,7 @@ def interpret(text,backend='mock',model=None):
     if expected['action']=='stop':return dict(final=expected,raw=None,reason='stop_priority')
     if backend=='mock':return dict(final=expected,raw=None,reason='mock_no_ai')
     if backend!='ollama' or not model:raise ValueError('local model required')
-    request=dict(model=model,stream=False,think=False,keep_alive='2m',format=SCHEMA,options={'temperature':0,'num_ctx':2048,'num_predict':180},messages=[{'role':'system','content':PROMPT},{'role':'user','content':text}])
+    request=dict(model=model,stream=False,think=False,keep_alive='2m',format=SCHEMA,options={'temperature':0,'num_ctx':2048,'num_predict':180},messages=[{'role':'system','content':PROMPT},{'role':'user','content':canonical_table_names(text) if expected['action']=='move' else text}])
     req=urllib.request.Request('http://127.0.0.1:11434/api/chat',data=json.dumps(request).encode(),headers={'Content-Type':'application/json'})
     with urllib.request.urlopen(req,timeout=45) as response:result=json.load(response)
     try:payload=json.loads(result['message']['content'])

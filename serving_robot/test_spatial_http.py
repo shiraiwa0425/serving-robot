@@ -22,6 +22,16 @@ class HTTPTests(unittest.TestCase):
         s=self.state();self.assertEqual(s['status'],'moving');self.assertEqual(list(s['path'][-1]),p['point'])
         self.assertEqual(self.post('/confirm',{'candidate_id':p['id']})[0],409)
         self.assertEqual(self.post('/stop',{})[0],200);self.assertFalse(self.state()['path'])
+    def test_table_aliases_preview_and_invalid_names(self):
+        for name in ['一番テーブル','一番卓','1番テーブル','1番卓']:
+            self.assertEqual(self.post('/command',{'text':name+'へ'})[0],200)
+            state=self.state()
+            self.assertEqual(state['candidate']['landmarks'],['table1'])
+            self.assertEqual(state['candidate']['label'],'1番テーブル')
+            self.assertEqual(state['status'],'awaiting_confirmation');self.assertFalse(state['path'])
+        for text in ['一番卓と三万テーブルの間へ','四番卓へ','テーブルへ']:
+            self.post('/command',{'text':text});state=self.state()
+            self.assertIsNone(state['candidate']);self.assertFalse(state['path']);self.assertEqual(state['status'],'clarify');self.assertIn('1〜3番テーブル',state['intent']['message'])
     def test_cancel_new_command_and_stale_ids(self):
         self.post('/command',{'text':'右上へ'});old=self.state()['candidate']['id'];self.post('/command',{'text':'3番の近くへ'});new=self.state()['candidate']['id']
         self.assertNotEqual(old,new);self.assertEqual(self.post('/cancel',{'candidate_id':old})[0],409);self.assertEqual(self.post('/confirm',{'candidate_id':old})[0],409)
