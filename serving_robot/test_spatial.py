@@ -5,6 +5,54 @@ from spatial_map import candidate
 from session import Session,Conflict
 from sim import Simulation,GOALS,free,plan
 class SpatialTests(unittest.TestCase):
+    def assert_refused_candidate(self,text,guessed):
+        self.assertEqual(evidence(text),empty())
+        self.assertEqual(checked_model(text,guessed)['final'],empty())
+        self.assertEqual(checked_model(text,empty())['final'],empty())
+        session=Session();session.command(text)
+        self.assertIsNone(session.pending);self.assertFalse(session.sim.path)
+    def test_review_common_prohibitions(self):
+        guessed=dict(action='move',relation='landmark',landmarks=['table1'],corner='none')
+        for text in ['1番へ行ってはいけません','1番へ行くべきではありません',
+                     '1番へは行きません','1番へ行かぬように','1番へ行かずに待って',
+                     '1番へ行くことは認めません','1番へ行ってはだめです']:
+            with self.subTest(text=text):self.assert_refused_candidate(text,guessed)
+    def test_review_numeric_expressions_are_not_table_suffixes(self):
+        guessed=dict(action='move',relation='landmark',landmarks=['table2'],corner='none')
+        for text in ['1,2番へ','1、2番へ','1 / 2番へ','1/2番へ','１／２番へ',
+                     '½番へ','二分の一番へ','テーブル1,2へ','テーブル1/2へ',
+                     '1,2番と3番の間へ','1/2番の近くへ',
+                     '1・2番へ','1〜2番へ','1~2番へ','1と2番へ']:
+            with self.subTest(text=text):self.assert_refused_candidate(text,guessed)
+    def test_review_unsupported_spatial_modifiers(self):
+        cases=[('1番の右側の近くへ','near',['table1'],'none'),
+               ('1番の右隣の近くへ','near',['table1'],'none'),
+               ('1番の北側の近くへ','near',['table1'],'none'),
+               ('1番の前方の近くへ','near',['table1'],'none'),
+               ('1番の後ろの近くへ','near',['table1'],'none'),
+               ('1番の正面の近くへ','near',['table1'],'none'),
+               ('1番から2m離れた近くへ','near',['table1'],'none'),
+               ('1番と2番の間の右側へ','between',['table1','table2'],'none'),
+               ('1番と2番の間から30cm奥へ','between',['table1','table2'],'none'),
+               ('左上の角から1m右へ','corner',[],'top_left'),
+               ('左上の角から1メートルへ','corner',[],'top_left'),
+               ('右上の角の隣へ','corner',[],'top_right'),
+               ('右上から二歩へ','corner',[],'top_right')]
+        for text,relation,refs,corner in cases:
+            guessed=dict(action='move',relation=relation,landmarks=refs,corner=corner)
+            with self.subTest(text=text):self.assert_refused_candidate(text,guessed)
+    def test_review_preserves_supported_relations_and_stop_priority(self):
+        for text in ['一番卓へ','1番へ必ず運んで','2番テーブルと三番卓の間へ',
+                     '三番卓の近くへ','左上の角へ','右下へ','厨房に戻って',
+                     '1番の近くへ行って下さい','1番と2番の間へ行って下さい',
+                     '右上へ行って下さい']:
+            with self.subTest(text=text):
+                spec=evidence(text);self.assertEqual(spec['action'],'move')
+                self.assertEqual(checked_model(text,spec)['final'],spec)
+                self.assertEqual(checked_model(text,empty())['final'],empty())
+        for text in ['1,2番へ、いや停止して','1番の右側の近くへ、キャンセル',
+                     '1番へ行ってはいけません、停止して']:
+            self.assertEqual(evidence(text),empty('stop'))
     def test_relation_evidence(self):
         for text,r,refs,c in [('2番テーブルと3番テーブルの間へ','between',['table2','table3'],'none'),('三番と二番の間に行って','between',['table2','table3'],'none'),('一番テーブルの近くへ','near',['table1'],'none'),('部屋の右上へ','corner',[],'top_right'),('部屋の左下の角へ','corner',[],'bottom_left'),('キッチンに戻って','landmark',['kitchen'],'none')]:
             with self.subTest(text=text):self.assertEqual(evidence(text),dict(action='move',relation=r,landmarks=refs,corner=c))

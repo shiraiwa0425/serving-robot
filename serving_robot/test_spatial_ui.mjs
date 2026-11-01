@@ -149,3 +149,32 @@ console.log('PASS: polls begun during mutation cannot restore obsolete feedback 
  assert.equal(h.node('error').textContent,'最新の入力エラー');assert.equal(h.node('error').className,'');
 }
 console.log('PASS: older success cannot erase the latest command error');
+
+// A superseded request must not block the latest successful operation's state.
+// Keep the older HTTP request unresolved until after the fresh state renders.
+for(const latestAction of ['command','stop'])for(const oldFails of [false,true]){
+ const h=await pendingHarness(),old=h.submit();
+ if(latestAction==='command')h.submit();else h.node('stop').onclick();
+ const latest=h.requests.at(-1);
+ h.state.epoch=3;h.state.status=latestAction==='command'?'awaiting_confirmation':'stopped';
+ h.state.intent={backend:'mock',action:latestAction==='command'?'candidate':'stop',message:'最新操作の結果'};
+ h.state.candidate=latestAction==='command'?{id:'newest',point:[4.7,3],label:'2番テーブル',path:[],explanation:'候補'}:null;
+ latest.resolve(response());await flush();await h.poll();
+ assert.match(h.node('info').textContent,/最新操作の結果/);
+ assert.equal(h.node('proposal').hidden,latestAction!=='command');
+ assert.equal(h.node('confirm').disabled,latestAction!=='command');expectClear(h);
+ old.resolve(response(oldFails?'古いエラー':null));await flush();await h.poll();
+ assert.match(h.node('info').textContent,/最新操作の結果/);expectClear(h);
+}
+console.log('PASS: superseded unfinished requests do not block latest candidate or stop state');
+// Finishing an older request must not release the newest request's poll barrier.
+{
+ const h=await pendingHarness(),old=h.submit(),latest=h.submit();
+ h.state.epoch=2;h.state.status='awaiting_confirmation';
+ h.state.candidate={id:'obsolete',point:[1,1],label:'古い候補',path:[],explanation:'候補'};
+ old.resolve(response());await flush();await h.poll();expectPending(h);
+ h.state.epoch=3;h.state.candidate={...h.state.candidate,id:'latest',label:'最新候補'};
+ latest.resolve(response());await flush();await h.poll();
+ assert.equal(h.node('candidate-label').textContent,'最新候補');assert.equal(h.node('confirm').disabled,false);
+}
+console.log('PASS: older completion cannot release the latest pending poll barrier');

@@ -32,6 +32,15 @@ class HTTPTests(unittest.TestCase):
         for text in ['一番卓と三万テーブルの間へ','四番卓へ','テーブルへ']:
             self.post('/command',{'text':text});state=self.state()
             self.assertIsNone(state['candidate']);self.assertFalse(state['path']);self.assertEqual(state['status'],'clarify');self.assertIn('1〜3番テーブル',state['intent']['message'])
+    def test_unsupported_instructions_invalidate_previous_candidate(self):
+        for text in ['1番へ行ってはいけません','1,2番へ','1/2番へ','1番の右側の近くへ','左上の角から1m右へ']:
+            with self.subTest(text=text):
+                self.post('/command',{'text':'1番へ'});old=self.state()['candidate']['id']
+                self.assertEqual(self.post('/command',{'text':text})[0],200)
+                state=self.state()
+                self.assertIsNone(state['candidate']);self.assertFalse(state['path'])
+                self.assertEqual(state['status'],'clarify')
+                self.assertEqual(self.post('/confirm',{'candidate_id':old})[0],409)
     def test_cancel_new_command_and_stale_ids(self):
         self.post('/command',{'text':'右上へ'});old=self.state()['candidate']['id'];self.post('/command',{'text':'3番の近くへ'});new=self.state()['candidate']['id']
         self.assertNotEqual(old,new);self.assertEqual(self.post('/cancel',{'candidate_id':old})[0],409);self.assertEqual(self.post('/confirm',{'candidate_id':old})[0],409)
