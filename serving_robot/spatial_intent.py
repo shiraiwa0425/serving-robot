@@ -25,7 +25,9 @@ landmarksはlandmark/nearなら1要素、betweenなら2要素、cornerなら空�
 
 # Consume the complete number and optional table noun, never a valid suffix of
 # an unknown number (e.g. 十一番, 1.2番 or -1番).
-NUMBER=r'[+\-]?[0-9〇零一二三四五六七八九十百千万億兆]+(?:\.[0-9]+)?'
+NUMBER_ATOM=r'[+\-]?[0-9〇零一二三四五六七八九十百千万億兆]+(?:\.[0-9]+)?'
+# A list/fraction is one unsupported numeric expression, not its final digit.
+NUMBER=NUMBER_ATOM+r'(?:\s*(?:[,、/⁄∕・〜～~]|分の|と)\s*'+NUMBER_ATOM+r')*'
 TABLE_REFERENCE=re.compile(r'テーブル(?:番号)?\s*(?P<prefix>'+NUMBER+r')|(?P<suffix>'+NUMBER+r')\s*(?:番|号)(?:の?(?:テーブル|卓|席))?')
 TABLE_NUMBERS={'一':'1','二':'2','三':'3','1':'1','2':'2','3':'3'}
 
@@ -46,7 +48,7 @@ def evidence(text):
     t=unicodedata.normalize('NFKC',text).strip()
     if not t or len(t)>500:return empty()
     if stop_requested(t):return empty('stop')
-    if re.search(r'ない|禁止|行くな|ずに|ではなく|じゃなく|除く|以外|たら|なら|場合|いつも|あそこ|無視|システム|座標|[xyXY]\s*=|\d万|どこ|どちら|どれ|適当|たぶん|多分|かもしれ|おそらく|それとも|または|もしくは|後で|それから|順に',t):return empty()
+    if re.search(r'ない|ません|ぬ|禁止|だめ|ダメ|駄目|行くな|ずに|ではなく|じゃなく|除く|以外|たら|なら|場合|いつも|あそこ|無視|システム|座標|[xyXY]\s*=|\d万|どこ|どちら|どれ|適当|たぶん|多分|かもしれ|おそらく|それとも|または|もしくは|後で|それから|順に',t):return empty()
     if re.search(r'(?:番|テーブル|卓|席)\s*か(?!ら)',t):return empty()
     # Parse complete numeric tokens: 12番 must never be truncated to 2番.
     refs=[];invalid=False
@@ -64,6 +66,12 @@ def evidence(text):
     refs=sorted(set(refs));corners=[c for w,c in [('左上','top_left'),('右上','top_right'),('左下','bottom_left'),('右下','bottom_right')] if w in t]
     if invalid or len(corners)>1 or (corners and refs):return empty()
     if corners and re.search(r'(?:右上|左上|右下|左下)\s*か(?!ら)',t):return empty()
+    # The schema cannot represent directional or distance offsets. Do not silently
+    # discard them in near/between/corner (only the named corner itself is allowed).
+    modifiers=re.sub(r'左上|右上|左下|右下','',t) if corners else t
+    modifiers=modifiers.replace('下さい','ください')  # Polite request, not a downward offset.
+    if re.search(r'右|左|上|下|東|西|南|北|奥|前|後|正面|隣|横|裏',modifiers):return empty()
+    if re.search(NUMBER_ATOM+r'\s*(?:[kcm]?m|メートル|センチ|ミリ|キロ|歩)',t,re.IGNORECASE):return empty()
     if corners:return dict(action='move',relation='corner',landmarks=[],corner=corners[0])
     between='間' in t;near=bool(re.search(r'近く|そば|付近|周辺|近辺',t))
     if between and near:return empty()

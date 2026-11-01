@@ -5,7 +5,7 @@ body{font-family:system-ui;background:#101c2b;color:#e4edf8;max-width:1120px;mar
 const $=id=>document.getElementById(id),names={kitchen:'厨房',table1:'1番テーブル',table2:'2番テーブル',table3:'3番テーブル'};let candidateId=null,displayedEpoch=-1,pollSequence=0,appliedPoll=0,operation=0,mutating=0,localErrorOperation=-1,localErrorEpoch=-1,pendingOperation=-1;
 function feedback(message,pending=false){$('error').textContent=message;$('error').className=pending?'pending':'';}
 async function send(path,body={}){
- const version=++operation;mutating++;localErrorOperation=-1;
+ const version=++operation;mutating=version;localErrorOperation=-1;
  pendingOperation=path==='/command'?version:-1;
  feedback(pendingOperation===version?'指示を解釈して候補を作成中です…':'',pendingOperation===version);
  clearCandidate();
@@ -22,7 +22,8 @@ async function send(path,body={}){
    feedback('接続エラー。サーバーの状態を確認して、もう一度お試しください。');
   }
  }finally{
-  mutating--;
+  // Superseded requests cannot block polling or clear a newer operation.
+  if(mutating===version)mutating=0;
   // Only the latest command owns the pending message, including overlapping requests.
   if(version===operation&&pendingOperation===version){pendingOperation=-1;feedback('');}
  }
