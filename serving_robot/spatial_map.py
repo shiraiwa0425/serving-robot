@@ -4,7 +4,7 @@ from sim import GOALS,BOXES,free,plan
 
 TABLES={name:BOXES[i] for i,name in enumerate(['table1','table2','table3'])}
 CORNER_ANCHORS={'top_left':(.5,5.5),'top_right':(5.5,5.5),'bottom_left':(.5,.5),'bottom_right':(5.5,.5)}
-LABELS={'kitchen':'厨房','table1':'1番卓','table2':'2番卓','table3':'3番卓', 'top_left':'左上','top_right':'右上','bottom_left':'左下','bottom_right':'右下'}
+LABELS={'kitchen':'厨房','table1':'1番テーブル','table2':'2番テーブル','table3':'3番テーブル', 'top_left':'左上','top_right':'右上','bottom_left':'左下','bottom_right':'右下'}
 
 def candidate(spec,start):
     relation=spec['relation'];refs=spec['landmarks'];adjustment=0.

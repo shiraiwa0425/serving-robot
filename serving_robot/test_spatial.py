@@ -1,6 +1,6 @@
-import math,threading,unittest
+import io,json,math,threading,unittest
 from unittest.mock import patch
-from spatial_intent import evidence,validate,checked_model
+from spatial_intent import evidence,validate,checked_model,interpret,canonical_table_names,empty
 from spatial_map import candidate
 from session import Session,Conflict
 from sim import Simulation,GOALS,free,plan
@@ -8,6 +8,62 @@ class SpatialTests(unittest.TestCase):
     def test_relation_evidence(self):
         for text,r,refs,c in [('2番テーブルと3番テーブルの間へ','between',['table2','table3'],'none'),('三番と二番の間に行って','between',['table2','table3'],'none'),('一番テーブルの近くへ','near',['table1'],'none'),('部屋の右上へ','corner',[],'top_right'),('部屋の左下の角へ','corner',[],'bottom_left'),('キッチンに戻って','landmark',['kitchen'],'none')]:
             with self.subTest(text=text):self.assertEqual(evidence(text),dict(action='move',relation=r,landmarks=refs,corner=c))
+    def test_table_aliases_and_model_guard(self):
+        # Model payloads are fixtures, not evidence of real LLM accuracy.
+        for n,kanji in [('1','一'),('2','二'),('3','三')]:
+            for number in [n,kanji,chr(ord('１')+int(n)-1)]:
+                for suffix in ['番テーブル','番卓','番のテーブル','番の卓','番']:
+                    name=number+suffix
+                    for tail,relation in [('へ運んで','landmark'),('の近くへ','near')]:
+                        text=name+tail
+                        expected=dict(action='move',relation=relation,landmarks=['table'+n],corner='none')
+                        with self.subTest(text=text):
+                            self.assertEqual(evidence(text),expected)
+                            self.assertEqual(canonical_table_names(text),n+'番テーブル'+tail)
+                            self.assertEqual(checked_model(text,expected)['final'],expected)
+                            self.assertEqual(checked_model(text,empty())['final'],empty())
+        for left in ['一番テーブル','一番卓','1番テーブル','1番卓']:
+            for right in ['二番テーブル','二番卓','2番テーブル','2番卓']:
+                expected=dict(action='move',relation='between',landmarks=['table1','table2'],corner='none')
+                self.assertEqual(evidence(left+'と'+right+'の間へ'),expected)
+                self.assertEqual(checked_model(left+'と'+right+'の間へ',expected)['final'],expected)
+    def test_incomplete_and_malformed_table_names(self):
+        for text in ['テーブルへ','卓へ','番テーブルへ','一テーブルへ','一卓へ',
+                     '0番卓へ','4番テーブルへ','四番卓へ','12番卓へ','十一番卓へ',
+                     '百一番卓へ','零一番卓へ','-1番卓へ','1.2番卓へ','01番卓へ',
+                     '.1番卓へ','1.2.3番卓へ','−1番卓へ','A1番卓へ',
+                     '1番番卓へ','1番テーブル2へ','1番卓Xへ','3万テーブルへ',
+                     '一番卓と三万テーブルの間へ','一番卓とテーブルの間へ',
+                     '一番卓と名前不明の卓の近くへ','右上とテーブルへ',
+                     '一番テーブルか二番テーブルの間へ','一番卓か一番テーブルの近くへ']:
+            with self.subTest(text=text):
+                self.assertEqual(evidence(text),empty())
+                guessed=dict(action='move',relation='landmark',landmarks=['table1'],corner='none')
+                self.assertEqual(checked_model(text,guessed)['final'],empty())
+    def test_model_request_uses_canonical_name_but_keeps_guard(self):
+        expected=evidence('一番卓の近くへ')
+        response=io.BytesIO(json.dumps({'message':{'content':json.dumps(expected)}}).encode())
+        with patch('spatial_intent.urllib.request.urlopen',return_value=response) as request:
+            result=interpret('一番卓の近くへ','ollama','fixture-only')
+        body=json.loads(request.call_args.args[0].data)
+        self.assertEqual(body['messages'][-1]['content'],'1番テーブルの近くへ')
+        self.assertEqual(result['final'],expected)
+        original='一番卓と3万テーブルの間へ'
+        guessed=dict(action='move',relation='between',landmarks=['table1','table3'],corner='none')
+        response=io.BytesIO(json.dumps({'message':{'content':json.dumps(guessed)}}).encode())
+        with patch('spatial_intent.urllib.request.urlopen',return_value=response) as request:
+            result=interpret(original,'ollama','fixture-only')
+        self.assertEqual(json.loads(request.call_args.args[0].data)['messages'][-1]['content'],original)
+        self.assertEqual(result['final'],empty());self.assertEqual(result['reason'],'text_evidence_disagrees')
+        with patch('spatial_intent.urllib.request.urlopen') as request:
+            self.assertEqual(interpret('三万テーブルへ、いや停止して','ollama','fixture-only')['final'],empty('stop'))
+            request.assert_not_called()
+    def test_alias_candidate_requires_confirmation(self):
+        s=Session();s.command('一番卓へ');self.assertEqual(s.sim.status,'awaiting_confirmation')
+        self.assertEqual(s.pending['label'],'1番テーブル');self.assertFalse(s.sim.path)
+        s.command('一番テーブルと二番卓の間へ')
+        self.assertEqual(s.pending['label'],'1番テーブルと2番テーブルの間');self.assertFalse(s.sim.path)
+        s.command('一番卓と三万テーブルの間へ');self.assertIsNone(s.pending);self.assertFalse(s.sim.path)
     def test_ambiguity_unknown_negation(self):
         for text in ['2番と3万の間','12番の近く','四番テーブルの近く','部屋の角へ','右上か左下へ','1番と1番の間','1番と2番と3番の間','2番か3番の間','1番の右隣へ','厨房と2番の間','2番の近くと右上','1番には行かないで','座標(2,3)へ','1番と2番の間の近く','3番に行ったら厨房へ']:
             with self.subTest(text=text):self.assertEqual(evidence(text)['action'],'clarify')
