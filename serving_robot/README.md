@@ -1,22 +1,8 @@
-# 利用時の補足・実装と評価
+# 設定・トラブル対応・実装と評価
 
-**初めて使う方は、[ルートREADMEの導入・起動・操作手順](../README.md) から始めてください。** `main` には、テーブルの間・近く・画面の四隅を候補として表示し、確認後に移動する機能が含まれています。
-
-初回セットアップでは、Ollama（推論ランタイム／サーバー）の導入、LLM `qwen3:1.7b` の取得、11434への接続とモデル一覧の確認、clone内のPython仮想環境作成が必要です。[ルートREADMEの初回セットアップ](../README.md#3-実aiで起動する)を順に実行してください。開発者が用意したOllamaや親フォルダは不要で、Hugging Faceからの直接ダウンロードも不要です。
-
-Mac／WSLでOllamaが未導入の場合だけ、公式コマンドで導入します。導入済みかの確認とインストーラーの変更内容は、ルートREADMEを参照してください。
-
-```sh
-curl -fsSL https://ollama.com/install.sh | sh
-```
+初めて使う方は [ルートREADMEのセットアップと操作手順](../README.md) から始めてください。以下のコマンドは、特記がなければcloneのルートで実行します。
 
 ## コマンドと実行場所
-
-アプリを起動するときはリポジトリのルートで、clone内に作った仮想環境を指定します。
-
-```sh
-.venv/bin/python -B serving_robot/app.py --backend ollama --model qwen3:1.7b --port 8767
-```
 
 | CLI | 内容 |
 |---|---|
@@ -27,15 +13,35 @@ curl -fsSL https://ollama.com/install.sh | sh
 
 Ollama接続先は実装内で `http://127.0.0.1:11434/api/chat` に固定されています。アプリの `--port` はWeb画面用であり、Ollamaのポートを変更するオプションではありません。仮想環境はモデルを含まず、モデル取得だけでもPython依存は準備されません。
 
+## 起動時の補足
+
+ブラウザ → Pythonアプリ（8767）→ Ollama（11434）→ Qwen3の順で接続します。モデルは `ollama pull` で取得でき、Hugging Faceからの直接取得やPython用Ollama SDKは不要です。モデルの保存先はサーバー設定によります。
+
+公式インストーラーはMacではアプリとCLIリンクを配置して起動し、既存アプリは停止・置換します。WSLではsystemdの状態に応じてユーザー・サービス作成と自動起動を設定します。初回Ollama起動時には `~/.ollama/id_ed25519` と `.pub` を生成する場合があります。鍵・モデル・仮想環境はGitへ含めないでください。
+
+省メモリ用に新しくCLIサーバーを起動する場合の例です。既存サーバーには反映されません。
+
+```sh
+OLLAMA_HOST=127.0.0.1:11434 OLLAMA_NO_CLOUD=1 OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_CONTEXT_LENGTH=2048 OLLAMA_KEEP_ALIVE=2m ollama serve
+```
+
+AIなしで画面・制御だけを試す場合：
+
+```sh
+.venv/bin/python -B serving_robot/app.py --backend mock --port 8768
+```
+
+http://127.0.0.1:8768/ を開きます。`MOCK · 実AI未使用` はルールによる代替で、実AIの成功とは区別してください。
+
 ## よくある問題
 
 | 症状 | 確認すること |
 |---|---|
-| `ollama: command not found` | [ルートREADMEの共通導入手順](../README.md#初回のみollamaを導入するmacwsl共通)で既存CLI・サーバーを確認。未導入の場合だけ上記の公式インストールコマンドを実行。導入済みならCLIのPATHを確認し、二重インストールしない |
+| `ollama: command not found` | [ルートREADME](../README.md#1-初回セットアップ)で既存CLI・サーバーを確認。未導入の場合だけ公式インストールコマンドを実行。導入済みならCLIのPATHを確認し、二重インストールしない |
 | `.venv/bin/python` がない | ルートREADMEのvenv作成を行ったか。カレントディレクトリがcloneのルートか |
 | `No module named mujoco` | 同じvenvのPythonで `-m pip install -r serving_robot/requirements-lock.txt` を行ったか |
 | 依存のインストールに失敗 | 検証済みPythonは3.9.6。別のPython/OSでの互換性は未検証。既存の他環境を上書きせず、エラーとバージョンを確認 |
-| ブラウザで接続できない | サーバーが稼働中か。アプリ起動時のポートとURLが同じか。同じMacから開いているか |
+| ブラウザで接続できない | サーバーが稼働中か。アプリ起動時のポートとURLが同じか。MacまたはWSLホストWindowsから開いているか |
 | `Address already in use` | 同じポートの既存サーバーを二重起動していないか。アプリは例として `--port 8769` に変更し、ブラウザも `http://127.0.0.1:8769/` に合わせる。無関係なサービスを停止しない |
 | `api/tags` の `models` が空／モデルがない | 接続中のサーバーに `OLLAMA_HOST=127.0.0.1:11434 ollama pull qwen3:1.7b` で取得し、同じ接続先の `ollama list` を再確認。保存先はサーバー設定による |
 | 推論に失敗・確認待ち | Ollamaが11434で応答するか、モデル名と取得状況が正しいか。別ターミナルで `OLLAMA_HOST=127.0.0.1:11434 ollama list` を確認。初回ロードの遅延もある |
@@ -46,19 +52,18 @@ Ollama接続先は実装内で `http://127.0.0.1:11434/api/chat` に固定され
 サーバー状態の読み取り確認：
 
 ```sh
-curl --silent --fail http://127.0.0.1:11434/api/version
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/version
+curl --show-error --silent --fail --max-time 3 http://127.0.0.1:11434/api/tags
 curl --silent --fail http://127.0.0.1:8767/state
 ```
 
-今回のREADME改善では、第三者の新規環境で導入・起動を通す試験は行っていません。上記はコードのCLI・接続先・画面ラベルとの静的照合結果です。保存された過去の成功記録と区別してください。
+`api/tags` のmodelsが空なら未取得です。モデル名を確認してからアプリを使ってください。WSLの画面が開かない場合は [localhost転送](https://learn.microsoft.com/en-us/windows/wsl/networking) を確認します。OllamaとPythonを同じUbuntu内で動かすため、両者の接続に外部公開は不要です。
 
-## 開発時の特殊な配置から移行する方へ
+導入手順はCLI・接続先・画面ラベルとの静的照合のみです。新規環境・WSLでの通し実行は未検証です。
 
-以前のREADMEは、cloneの外側にある `../../.venv` や `../../run-ollama.sh` を再利用する、開発者固有の配置を前提としていました。通常のcloneにはそれらはありません。新規利用者はルートREADMEの手順でclone内にvenvを作り、通常の `ollama serve` を使ってください。
+## 以前の開発配置について
 
-リポジトリ内の `run-ollama.sh` は、`.tools/ollama/ollama` と `models` をclone内に配置済みの場合の補助スクリプトです。Ollamaのインストーラーではなく、バイナリやモデルも同梱していません。標準CLIでの導入では使う必要はありません。
-
-旧版で使った8766や開発プレビューの8768はアプリに固定された必須ポートではありません。現在の既定値は8767です。すでに使用中なら別ポートを指定してください。
+通常のcloneでは親フォルダのvenvや起動スクリプトは使いません。同梱の `run-ollama.sh` はclone内の `.tools/ollama/ollama` と `models` を準備済みの場合の補助で、インストーラーではありません。標準手順では不要です。旧ポート8766も必須ではなく、現在の既定は8767です。
 
 ## 検証済み構成とモデル
 
@@ -72,6 +77,9 @@ curl --silent --fail http://127.0.0.1:8767/state
 - 記録上のOllamaモデル割当は約1.21 GB。OSやプロセス全体の総RAM・ピーク使用量ではありません。他の機器での余裕や速度は未検証です。
 
 ## 地図・物理・対応範囲
+
+入力例は「1番へ配膳して」「厨房に戻って」「2番テーブルと3番テーブルの間へ」「1番の近くへ」「部屋の右上へ」です。「2番と3万の間へ」「12番の近くへ」「部屋の角へ」は推測せず確認要求に戻します。右下などは障害物を避けて補正するため、候補を確認してください。新指示・取り消し・停止で古い候補は失効します。
+
 
 6×6 mの固定地図、厨房、3卓、中央障害物を用います。台車は半径0.22 m・質量約8 kg、平面拘束された全方向移動モデルです。MuJoCoが速度サーボ、力上限、接触と時間発展を計算し、ブラウザのSVGがその状態を表示します。単なるUIアニメーションではありませんが、車輪・荷物・人・実センサーの詳細モデルではありません。
 
